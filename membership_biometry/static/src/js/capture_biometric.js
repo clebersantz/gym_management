@@ -16,11 +16,11 @@ odoo.define('membership_capture_biometric', function (require) {
         start: function () {
             const self = this;
 
-            const content = $(QWeb.render("CapturePartnerImage"));
+            const $el = $(QWeb.render("CapturePartnerImage"));  // Renderiza o template XML
 
             this.dialog = new Dialog(this, {
-                title: "Captura de Imagem do Parceiro",
-                $content: content,
+                title: "Capturar Biometria",
+                $content: $el,
                 buttons: [],
                 size: 'medium',
                 onForceClose: function () {
@@ -32,7 +32,7 @@ odoo.define('membership_capture_biometric', function (require) {
             this.dialog.open();
 
             this._start_video_stream();
-            this._bind_events(content);
+            this._bind_events($el);
         },
 
         _start_video_stream: function () {
@@ -71,7 +71,11 @@ odoo.define('membership_capture_biometric', function (require) {
                     args: [[self.partner_id], imageData],
                     context: session.user_context,
                 }).then(() => {
-                    self._on_close();
+                    Dialog.alert(self, "Imagem capturada e salva com sucesso!", {
+                        onClose: function () {
+                            self._on_close();
+                        }
+                    });
                 });
             });
         },
@@ -93,6 +97,4 @@ odoo.define('membership_capture_biometric', function (require) {
 
     core.action_registry.add('new_partner_image', CapturePartnerImage);
     return CapturePartnerImage;
-
-	
 });

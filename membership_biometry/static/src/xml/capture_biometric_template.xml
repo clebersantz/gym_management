@@ -1,24 +1,49 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<templates xml:space="preserve">
-    <t t-name="CapturePartnerImage">
-        <div class="modal show d-block" tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.5);">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Capturar Imagem do Parceiro</h5>
-                        <button type="button" class="btn-close" id="btn-close" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <video id="video" autoplay playsinline style="width: 100%; max-width: 400px;"></video>
-                        <br/>
-                        <button type="button" class="btn btn-primary mt-3" id="btn-click">Capturar</button>
-                        <canvas id="canvas" style="display: none;"></canvas>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="btn-close">Fechar</button>
-                    </div>
-                </div>
-            </div>
+<template xml:space="preserve">
+  <t t-name="CapturePartnerImage">
+    <div class="o_capture_image_modal" style="padding: 20px;">
+      <div class="o_modal_content">
+        <!--div class="o_modal_header" style="margin-bottom: 20px;">
+          <h3>Captura de Imagem do Parceiro</h3>
+          <button type="button" class="btn-close" id="btn-close">X</button>
+        </div-->
+
+        <!-- Área com Webcam e Canvas lado a lado -->
+        <div style="display: flex; flex-direction: row; justify-content: center; gap: 40px; margin-bottom: 20px;">
+          
+          <!-- Bloco da Webcam -->
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <h4>📷 Webcam</h4>
+            <video t-att-id="'video'"
+                   t-att-width="'320'"
+                   t-att-height="'240'"
+                   t-att-style="'border: 1px solid #ccc; border-radius: 8px;'"
+                   t-att-autoplay="'autoplay'"
+                   t-att-playsinline="'playsinline'">
+            </video>
+          </div>
+
+          <!-- Bloco da Imagem Capturada -->
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <h4>🖼️ Imagem Capturada</h4>
+            <canvas t-att-id="'canvas'"
+                    t-att-width="'320'"
+                    t-att-height="'240'"
+                    t-att-style="'border: 1px solid #ccc; border-radius: 8px;'">
+            </canvas>
+          </div>
+
         </div>
-    </t>
-</templates>
+
+        <!-- Botões -->
+        <div class="o_modal_footer" style="display: flex; justify-content: center; gap: 20px;">
+          <button type="button" class="btn btn-primary" id="btn-click">
+            <i class="fa fa-camera"></i> Capturar
+          </button>
+          <button type="button" class="btn btn-secondary" id="btn-close">
+            <i class="fa fa-times text-danger"></i> Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </t>
+</template>
