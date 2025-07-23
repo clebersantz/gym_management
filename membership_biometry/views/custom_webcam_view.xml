@@ -1,0 +1,40 @@
+<odoo>
+    <record id="view_partner_webcam_capture" model="ir.ui.view">
+        <field name="name">res.partner.webcam.capture</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <form string="Captura de Imagem Biométrica">
+                <group>
+                    <div class="custom-webcam-container">
+                        <video id="webcam_video" autoplay="true" style="border: 1px solid #aaa; width: 800px; height: 800px;"></video>
+                        <canvas id="webcam_canvas" style="display: none;"></canvas>
+                        <button id="start_camera" class="btn btn-primary" style="margin-top: 15px;">Iniciar Webcam</button>
+                        <button id="capture_image" class="btn btn-success" style="margin-top: 15px; display: none;">Capturar Imagem</button>
+                        <img id="captured_image" style="margin-top: 15px; display: none; width: 800px; height: 800px; border: 1px solid #aaa;" />
+                    </div>
+                </group>
+                <footer>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Adicionar botão Capturar Biometria na view do parceiro -->
+    <record id="view_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.biometric</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button
+                    name="action_open_webcam"
+                    type="object"
+                    string="Capturar Biometria"
+                    icon="fa-camera"
+                    class="oe_highlight"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

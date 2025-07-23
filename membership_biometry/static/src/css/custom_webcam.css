@@ -1,0 +1,12 @@
+.custom-webcam-container video {
+    margin-top: 10px;
+}
+
+.custom-webcam-container img {
+    margin-top: 15px;
+    border: 1px solid #ccc;
+}
+
+.custom-webcam-container button {
+    margin-top: 15px;
+}

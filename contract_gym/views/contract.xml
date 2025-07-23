@@ -1,0 +1,13 @@
+<odoo>
+  <record id="contract_contract_gym_form_view" model="ir.ui.view">
+    <field name="name">contract.contract form view (in gym contract)</field>
+    <field name="model">contract.contract</field>
+    <field name="inherit_id" ref="contract.contract_contract_form_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='line_recurrence']" position="after">
+        <field name="period_number"/>
+        <field name="period_type"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

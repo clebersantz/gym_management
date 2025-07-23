@@ -1,0 +1,42 @@
+<odoo>
+    <record id="view_partner_biometric_form" model="ir.ui.view">
+        <field name="name">res.partner.biometric.image.form</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <form string="Captura de Biometria Facial">
+                <group>
+                    <!-- Encapsula o campo e utiliza configurações personalizadas -->
+                    <div class="webcam-capture">
+                        <widget name="web_widget_image_webcam" options="{'preview_size': [800, 800]}"/>
+                    </div>
+                </group>
+                <footer>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    <!-- Botão Salvar comentado -->
+                    <!--
+                    <button name="save_biometric_image" type="object" class="btn-primary" string="Salvar"/>
+                    -->
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Botão na barra superior -->
+    <record id="view_partner_form_inherit_biometric" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.biometric</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[contains(@class, 'oe_button_box')]" position="inside">
+                <button
+                    name="new_partner_image"
+					id="image-capture-button"
+                    type="object"
+                    string="Biometria"
+                    icon="fa-camera"
+                    class="oe_highlight"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>
