@@ -1,105 +1,93 @@
-odoo.define('face_attendance.capture_image', function (require) {
+odoo.define('membership_biometry.capture_biometric', function (require) {
     "use strict";
 
-    var AbstractAction = require('web.AbstractAction');
-    var core = require('web.core');
-    var QWeb = core.qweb;
-    const session = require('web.session');
+    const AbstractAction = require('web.AbstractAction');
+    const core = require('web.core');
+    const QWeb = core.qweb;
 
-    var CaptureEmployeeImage = AbstractAction.extend({
+    const BiometryCaptureAction = AbstractAction.extend({
+        template: 'WebCamDialogWrapper',  // Um template com layout de dialog (abaixo explico)
+
         init: function (parent, action) {
-            this.employee_id = action.params.employee_id;
             this._super.apply(this, arguments);
+            this.partner_id = action && action.context ? action.context.partner_id : undefined;
         },
 
         start: function () {
-            try{
-                this._super.apply(this, arguments);
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    alert("Unable to access the camera");
-                    this.trigger_up('history_back');
-                } else {
-                    this.$el.html(QWeb.render("CaptureEmployeeImage", {}));
-                    this._start_video_stream();
-                    this._bind_events();
-                }
-            }
-            catch (error) {
-                console.log(error);
-            }
-            
+            this.$el.html(QWeb.render("WebCamDialog", {}));
+            this.initCamera();
+            this._bind_events();
+            return Promise.resolve();
         },
 
-        _start_video_stream: function () {
-            const self = this;
-            setTimeout(() => {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function (stream) {
-                        var video = document.getElementById('video');
-                        video.srcObject = stream;
-                    })
-                    .catch(function (err) {
-                        self._stop_stream();
-                        alert("Unable to access the camera");
-                        self.trigger_up('history_back');
-                    });
-            }, 500);
+        initCamera: function () {
+            const video = document.createElement('video');
+            video.setAttribute('autoplay', '');
+            video.setAttribute('playsinline', '');
+            video.style.width = '100%';
+            video.style.borderRadius = '8px';
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+
+            const btnCapture = document.createElement('button');
+            btnCapture.className = 'btn btn-primary mt-2';
+            btnCapture.innerHTML = '<i class="fa fa-camera"></i> Capturar';
+
+            const webcamContainer = this.$el.find('#live_webcam')[0];
+            const resultContainer = this.$el.find('#webcam_result')[0];
+
+            webcamContainer.innerHTML = '';
+            webcamContainer.appendChild(video);
+            webcamContainer.appendChild(btnCapture);
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error("Erro ao acessar webcam:", err);
+                    webcamContainer.innerHTML = `<p class="text-danger">Erro ao acessar a webcam</p>`;
+                });
+
+            btnCapture.addEventListener('click', () => {
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imgData = canvas.toDataURL('image/png');
+                resultContainer.innerHTML = '';
+
+                const img = document.createElement('img');
+                img.src = imgData;
+                img.style.width = '100%';
+                img.style.borderRadius = '8px';
+
+                resultContainer.appendChild(img);
+            });
         },
 
         _bind_events: function () {
-            this.$('#btn-close').on('click', this._on_close.bind(this));
-            this.$('#btn-click').on('click', this._on_capture.bind(this));
-        },
-
-        _on_capture: function () {
-            try {
-                const self = this;
-
-                var video = document.getElementById('video');
-                var canvas = document.getElementById('canvas');
-                var context = canvas.getContext('2d');
-
-                const targetWidth = 320;
-                const targetHeight = 240;
-
-                canvas.width = targetWidth;
-                canvas.height = targetHeight;
-
-                context.drawImage(video, 0, 0, targetWidth, targetHeight);
-
-                var imageData = canvas.toDataURL('image/png');
-
-                this._rpc({
-                    model: 'hr.employee',
-                    method: 'register_face',
-                    args: [[this.employee_id], imageData],
-                    context: session.user_context,
-                })
-                .then(function (result) {
-                    self._on_close();
-                });
-            } catch {
-                this._on_close();
-            }
-        },
-
-        _stop_stream: function () {
-            var video = document.getElementById('video');
-            if (video.srcObject) {
-                let tracks = video.srcObject.getTracks();
-                tracks.forEach(track => track.stop());
-                video.srcObject = null;
-            }
+            const self = this;
+            this.$('.btn-close-dialog').on('click', function () {
+                self._on_close();
+            });
         },
 
         _on_close: function () {
             this._stop_stream();
-            this.$('.o_capture_image_modal').remove();
-            this.trigger_up('history_back');
+            this.trigger_up('history_back'); // Fecha a action e retorna para tela anterior
+        },
+
+        _stop_stream: function () {
+            const video = document.querySelector('video');
+            if (video && video.srcObject) {
+                const tracks = video.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+                video.srcObject = null;
+            }
         }
     });
 
-    core.action_registry.add('new_employee_image', CaptureEmployeeImage);
+    core.action_registry.add('new_partner_image', BiometryCaptureAction);
 
-    return CaptureEmployeeImage;
+    return BiometryCaptureAction;
 });

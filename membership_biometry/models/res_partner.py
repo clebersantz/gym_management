@@ -12,14 +12,18 @@ class ResPartner(models.Model):
         attachment=True
     )
 
+
     def new_partner_image(self):
         return {
             'type': 'ir.actions.client',
             'tag': 'new_partner_image',
-            'params': {
+            'name': 'Captura de Biometria',
+            'context': {
                 'partner_id': self.id,
             }
         }
+
+
 
 
     @api.model

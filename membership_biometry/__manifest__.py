@@ -7,8 +7,9 @@
     ],
     'assets': {
         'web.assets_backend': [
-            '/membership_biometry/static/src/js/capture_biometric.js',
-            '/membership_biometry/static/src/xml/capture_biometric_template.xml',
+            'membership_biometry/static/src/js/capture_biometric.js',
+            'membership_biometry/static/src/css/capture_biometric.css',
+            'membership_biometry/static/src/xml/capture_biometric_template.xml',
         ],
     },
     'installable': True,

@@ -1,100 +1,85 @@
-odoo.define('membership_capture_biometric', function (require) {
+odoo.define('membership_biometry.capture_biometric', function (require) {
     "use strict";
 
-    const AbstractAction = require('web.AbstractAction');
+    const Dialog = require('web.Dialog');
     const core = require('web.core');
     const QWeb = core.qweb;
-    const Dialog = require('web.Dialog');
-    const session = require('web.session');
 
-    const CapturePartnerImage = AbstractAction.extend({
-        init: function (parent, action) {
-            this.partner_id = action.params.partner_id;
-            this._super.apply(this, arguments);
-        },
+    function openBiometryDialog(partner_id) {
+        const dialog = new Dialog(null, {
+            title: "Captura de Biometria Facial",
+            size: 'large',
+            $content: $(QWeb.render('membership_biometry.WebCamDialog', {})),
+            buttons: [],  // você pode adicionar botões se quiser salvar no backend
+        });
 
-        start: function () {
-            const self = this;
+        dialog.opened().then(() => {
+            const liveWebcamDiv = dialog.$el.find('#live_webcam')[0];
+            const resultContainer = dialog.$el.find('#webcam_result')[0];
+            const btnCapture = dialog.$el.find('#btn-click')[0];
+            const btnClose = dialog.$el.find('#btn-close')[0];
 
-            const $el = $(QWeb.render("CapturePartnerImage"));  // Renderiza o template XML
+            // Cria dinamicamente o vídeo
+            const video = document.createElement('video');
+            video.setAttribute('autoplay', '');
+            video.setAttribute('playsinline', '');
+            video.style.width = '100%';
+            video.style.borderRadius = '8px';
+            video.style.backgroundColor = '#000';
 
-            this.dialog = new Dialog(this, {
-                title: "Capturar Biometria",
-                $content: $el,
-                buttons: [],
-                size: 'medium',
-                onForceClose: function () {
-                    self._stop_stream();
-                    self.trigger_up('history_back');
-                },
-            });
+            // Insere o vídeo no container
+            liveWebcamDiv.innerHTML = '';
+            liveWebcamDiv.appendChild(video);
 
-            this.dialog.open();
+            // Cria canvas para captura
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
 
-            this._start_video_stream();
-            this._bind_events($el);
-        },
-
-        _start_video_stream: function () {
+            // Acessa webcam
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
-                    const video = document.getElementById('video');
                     video.srcObject = stream;
                 })
-                .catch(() => {
-                    alert("Não foi possível acessar a câmera.");
-                    this.trigger_up('history_back');
+                .catch(err => {
+                    console.error("Erro ao acessar webcam:", err);
+                    liveWebcamDiv.innerHTML = `<p class="text-danger">Erro ao acessar a webcam: ${err.name} - ${err.message}</p>`;
                 });
-        },
 
-        _bind_events: function ($el) {
-            const self = this;
-
-            $el.find('#btn-close').on('click', function () {
-                self._on_close();
-            });
-
-            $el.find('#btn-click').on('click', function () {
-                const video = document.getElementById('video');
-                const canvas = document.getElementById('canvas');
+            // Evento captura foto
+            btnCapture.addEventListener('click', () => {
                 const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imgData = canvas.toDataURL('image/png');
 
-                canvas.width = 320;
-                canvas.height = 240;
-                context.drawImage(video, 0, 0, 320, 240);
-
-                const imageData = canvas.toDataURL('image/png');
-
-                self._rpc({
-                    model: 'res.partner',
-                    method: 'register_face',
-                    args: [[self.partner_id], imageData],
-                    context: session.user_context,
-                }).then(() => {
-                    Dialog.alert(self, "Imagem capturada e salva com sucesso!", {
-                        onClose: function () {
-                            self._on_close();
-                        }
-                    });
-                });
+                resultContainer.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = imgData;
+                img.style.width = '100%';
+                img.style.borderRadius = '8px';
+                resultContainer.appendChild(img);
             });
-        },
 
-        _stop_stream: function () {
-            const video = document.getElementById('video');
-            if (video && video.srcObject) {
-                video.srcObject.getTracks().forEach(track => track.stop());
-                video.srcObject = null;
-            }
-        },
+            // Fecha diálogo e para stream
+            btnClose.addEventListener('click', () => {
+                if (video.srcObject) {
+                    const tracks = video.srcObject.getTracks();
+                    tracks.forEach(track => track.stop());
+                    video.srcObject = null;
+                }
+                dialog.close();
+            });
+        });
 
-        _on_close: function () {
-            this._stop_stream();
-            if (this.dialog) this.dialog.close();
-            this.trigger_up('history_back');
-        }
+        dialog.open();
+    }
+
+    core.action_registry.add('new_partner_image', function (env, action) {
+        openBiometryDialog(action.context.partner_id);
+        return Promise.resolve();
     });
 
-    core.action_registry.add('new_partner_image', CapturePartnerImage);
-    return CapturePartnerImage;
+    return {
+        openBiometryDialog,
+    };
 });
