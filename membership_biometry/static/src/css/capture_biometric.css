@@ -30,6 +30,12 @@
     height: 240px;
 }
 
+video {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  background-color: #000;
+}
+
 .direction_icon {
     text-align: center;
 }

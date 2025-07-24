@@ -2,16 +2,17 @@
 <templates xml:space="preserve">
 
     <t t-name="membership_biometry.WebCamDialog">
-        <div class="container">
+        <div class="container-fluid">
             <!-- Área de vídeo e imagem lado a lado -->
             <div class="row">
-                <div class="col-md-6">
-                    <div id="live_webcam" class="border rounded p-2">
+                <div class="col-md-5 live_webcam_outer_div">
+                    <div id="live_webcam">
                         <!-- Vídeo será inserido via JS -->
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div id="webcam_result" class="border rounded p-2">
+				<div class="col-md-2 mt64 direction_icon fa fa-angle-right fa-8x" />
+                <div class="col-md-5 webcam_result_outer_div">
+                    <div id="webcam_result">
                         <!-- Imagem capturada será inserida via JS -->
                     </div>
                 </div>
@@ -23,7 +24,7 @@
             </div>
 
             <!-- Botões -->
-            <div class="mt-3 d-flex justify-content-start">
+            <div class="mt-3 d-flex justify-content-center">
                 <button id="btn-click" class="btn btn-primary">Capturar</button>
                 <button id="btn-close" class="btn btn-secondary ml-2">Fechar</button>
             </div>
