@@ -24,9 +24,10 @@
             </div>
 
             <!-- Botões -->
-            <div class="mt-3 d-flex justify-content-center">
-                <button id="btn-click" class="btn btn-primary">Capturar</button>
-                <button id="btn-close" class="btn btn-secondary ml-2">Fechar</button>
+            <div class="mt-3 d-flex justify-content-center gap-2">
+                <button id="btn-capture" class="btn btn-primary  text-capitalize"      icon="fa-camera">Capture biometry</button>
+				<button id="btn-save"    class="btn btn-primary  text-capitalize"      >Save and close</button>
+                <!--button id="btn-close"   class="btn btn-secondary text-capitalize ml-2">Cancel</button-->
             </div>
         </div>
     </t>

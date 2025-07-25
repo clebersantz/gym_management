@@ -1,7 +1,8 @@
+# models/res_partner.py
+import base64
+import cv2
+import numpy as np
 from odoo import models, fields, api
-
-import logging
-_logger = logging.getLogger(__name__)
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
@@ -24,18 +25,38 @@ class ResPartner(models.Model):
         }
 
 
-
+    @api.onchange('image_biometric')
+    def _onchange_image_biometric(self):
+        for partner in self:
+            partner.image_1920 = partner.image_biometric
+        
+        
+       
 
     @api.model
-    def register_face(self, partner_id, image_data):
-    
-        partner = self.browse(partner_id)
-        if not partner.exists():
-            raise ValueError("Parceiro não encontrado.")
-        
-        # Se estiver no formato data:image/png;base64,...
-        if image_data.startswith("data:image"):
-            image_data = image_data.split(",")[1]
+    def detect_face_in_image(self, image_base64):
+        if not image_base64:
+            raise exceptions.ValidationError("Imagem não recebida.")
 
-        partner.image_biometric = image_data
-        return {'status': 'ok'}
+        try:
+            # Decodifica a imagem base64
+            img_data = base64.b64decode(image_base64)
+            np_arr = np.frombuffer(img_data, np.uint8)
+            img_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+            # Converte para escala de cinza
+            gray = cv2.cvtColor(img_np, cv2.COLOR_BGR2GRAY)
+
+            # Carrega o classificador de face Haar
+            face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+            # Detecta faces
+            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+
+            if len(faces) == 0:
+                return {'has_face': False}
+            return {'has_face': True}
+
+        except Exception as e:
+            raise exceptions.UserError(f"Erro ao processar imagem: {str(e)}")
+

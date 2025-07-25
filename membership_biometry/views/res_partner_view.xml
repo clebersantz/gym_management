@@ -1,10 +1,12 @@
 <odoo>
-    <!-- Botão na barra superior -->
+
     <record id="view_partner_form_inherit_biometric" model="ir.ui.view">
         <field name="name">res.partner.form.inherit.biometric</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+		
+			<!-- Botão na barra superior -->
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                 <button type="object"
                         name="new_partner_image"
@@ -14,6 +16,23 @@
                         attrs="{'invisible': [('is_company','=',True)]}"/>
 				<!--button name="new_partner_image" type="action" string="Biometria" icon="fa-camera"/-->
             </xpath>
+			
+
+            <!-- Aba de Biometria -->
+            <xpath expr="//page[@name='sales_purchases']" position="after">
+                <page name="biometry_tab" string="Biometry">
+                    <group>
+                        <field name="image_biometric"
+                               widget="image"
+							   class="img-thumbnail"
+                               options="{'preview_image': 'image_biometric'}"
+                               string="Biometric Image"
+							   style="max-width: 300px; max-height: 300px;"
+                               readonly="1"/>
+                    </group>
+                </page>
+            </xpath>			
+			
         </field>
     </record>
 	
