@@ -1,17 +1,21 @@
 {
-    'name': 'Membership Biometry',
-    'version': '16.0.1.0',
-    'depends': ['web', 'membership'],
-    'data': [
-        'views/res_partner_view.xml',
+    "name": "Membership Biometry",
+    "summary": "Widget para captura e exibição de biometria através de imagem",
+    "version": "16.0.1.0.0",
+    "category": "Custom",
+    "author": "Sua Empresa",
+    "license": "AGPL-3",
+    "depends": ["base", "web", "contacts"],
+    "data": [
+        "views/res_partner_view.xml",
     ],
-    'assets': {
-        'web.assets_backend': [
-            'membership_biometry/static/src/js/capture_biometric.js',
-            'membership_biometry/static/src/css/capture_biometric.css',
-            'membership_biometry/static/src/xml/capture_biometric_template.xml',
+    "assets": {
+        "web.assets_backend": [
+            "membership_biometry/static/src/js/image_biometric_field.js",
+            "membership_biometry/static/src/js/biometric_capture_dialog.js",
+            "membership_biometry/static/src/xml/image_biometric_field.xml",
         ],
     },
-    'installable': True,
-    'application': False,
+    "installable": True,
+    "application": False,
 }
